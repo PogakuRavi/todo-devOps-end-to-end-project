@@ -3,8 +3,10 @@ pipeline {
 
     environment {
         AWS_REGION = "ap-east-1"
-        ECR_REPO = "145023112348.dkr.ecr.ap-east-1.amazonaws.com/todo-app"
-        IMAGE_TAG = "latest"
+        ACCOUNT_ID = "145023112348"
+        ECR_REPO_NAME = "todo-app"
+        IMAGE_TAG = "${BUILD_NUMBER}"
+        ECR_URI = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
         SONARQUBE_ENV = "sonar-server"
     }
 
@@ -50,45 +52,45 @@ pipeline {
 
         stage('Docker Build') {
             steps {
-                sh 'docker build -t todo-app .'
+                sh '''
+                docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} .
+                '''
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                sh 'trivy image todo-app'
-            }
-        }
-
-        stage('Login to ECR') {
-            steps {
                 sh '''
-                aws ecr get-login-password --region $AWS_REGION \
-                | docker login --username AWS --password-stdin $ECR_REPO
-                '''
-            }
-        }
-
-        stage('Tag Image') {
-            steps {
-                sh '''
-                docker tag todo-app:latest $ECR_REPO:$IMAGE_TAG
+                trivy image ${ECR_REPO_NAME}:${IMAGE_TAG}
                 '''
             }
         }
 
         stage('Push to ECR') {
             steps {
-                sh '''
-                docker push $ECR_REPO:$IMAGE_TAG
-                '''
+                withCredentials([[
+                    $class: 'AmazonWebServicesCredentialsBinding',
+                    credentialsId: 'aws-creds'
+                ]]) {
+                    sh '''
+                    # Login to ECR
+                    aws ecr get-login-password --region ${AWS_REGION} \
+                    | docker login --username AWS --password-stdin ${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+
+                    # Tag image with build number
+                    docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${ECR_URI}:${IMAGE_TAG}
+
+                    # Push image
+                    docker push ${ECR_URI}:${IMAGE_TAG}
+                    '''
+                }
             }
         }
     }
 
     post {
         success {
-            echo "Pipeline executed successfully 🚀"
+            echo "Image pushed: ${ECR_URI}:${IMAGE_TAG} 🚀"
         }
         failure {
             echo "Pipeline failed ❌"
