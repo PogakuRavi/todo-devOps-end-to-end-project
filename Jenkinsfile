@@ -58,10 +58,12 @@ pipeline {
             }
         }
 
-        stage('Trivy Scan') {
+          stage('Trivy Scan') {
             steps {
                 sh '''
-                trivy image ${ECR_REPO_NAME}:${IMAGE_TAG}
+                docker run --rm \
+                  -v /var/run/docker.sock:/var/run/docker.sock \
+                  aquasec/trivy image ${ECR_REPO_NAME}:${IMAGE_TAG}
                 '''
             }
         }
