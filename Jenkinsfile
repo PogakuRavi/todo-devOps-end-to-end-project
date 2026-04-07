@@ -30,14 +30,17 @@ pipeline {
 
         stage('SonarQube Scan') {
             steps {
+            script {
+                def scannerHome = tool 'SonarQubeScanner'
                 withSonarQubeEnv("${SONARQUBE_ENV}") {
-                    sh '''
-                    sonar-scanner \
+                    sh """
+                    ${scannerHome}/bin/sonar-scanner \
                       -Dsonar.projectKey=todo-app \
                       -Dsonar.projectName=todo-app \
                       -Dsonar.sources=backend \
                       -Dsonar.sourceEncoding=UTF-8
-                    '''
+                    """
+                    }
                 }
             }
         }
