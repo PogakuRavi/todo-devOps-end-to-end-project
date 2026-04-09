@@ -9,7 +9,7 @@ replicaCount: 1
 image:
 image:
   repository: 145023112348.dkr.ecr.us-east-1.amazonaws.com/todo-app
-  tag: "12"
+  tag: "13"
   pullPolicy: Always
 
 # This is for the secrets for pulling an image from a private repository more information can be found here: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
