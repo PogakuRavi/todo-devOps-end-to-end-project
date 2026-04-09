@@ -1,15 +1,11 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "todo-app.fullname" . }}
-  labels:
-    {{- include "todo-app.labels" . | nindent 4 }}
+  name: todo-service
 spec:
-  type: {{ .Values.service.type }}
-  ports:
-    - port: {{ .Values.service.port }}
-      targetPort: http
-      protocol: TCP
-      name: http
+  type: LoadBalancer
   selector:
-    {{- include "todo-app.selectorLabels" . | nindent 4 }}
+    app: todo
+  ports:
+    - port: 80
+      targetPort: 3000
