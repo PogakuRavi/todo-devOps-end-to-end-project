@@ -7,13 +7,9 @@ pipeline {
         ECR_REPO_NAME = "todo-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
         ECR_URI = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
-        SONARQUBE_ENV = "sonar-server"
+        SONARQUBE_ENV = "sonarqube-server"
     }
-
-    tools {
-        nodejs "nodejs"
-    }
-
+    
     stages {
 
         stage('Checkout Code') {
@@ -58,7 +54,7 @@ pipeline {
                 sh '''
                 docker run --rm \
                   -v /var/run/docker.sock:/var/run/docker.sock \
-                  aquasec/trivy image ${ECR_REPO_NAME}:${IMAGE_TAG}
+                  aquasec/trivy:0.50.1 image ${ECR_REPO_NAME}:${IMAGE_TAG}
                 '''
             }
         }
