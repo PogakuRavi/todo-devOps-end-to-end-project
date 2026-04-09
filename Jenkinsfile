@@ -79,8 +79,7 @@ pipeline {
                 }
             }
         }
-    }
-        stage('Update Helm Chart') {
+         stage('Update Helm Chart') {
             steps {
             withCredentials([string(credentialsId: 'github-token', variable: 'GIT_TOKEN')]) {
         sh '''
@@ -97,6 +96,7 @@ pipeline {
             }
         }
     }
+}
 
     post {
         success {
