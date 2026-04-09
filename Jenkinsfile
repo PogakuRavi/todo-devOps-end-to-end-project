@@ -2,12 +2,12 @@ pipeline {
     agent any
 
     environment {
-        AWS_REGION = "ap-east-1"
+        AWS_REGION = "us-east-1"
         ACCOUNT_ID = "145023112348"
         ECR_REPO_NAME = "todo-app"
         IMAGE_TAG = "${BUILD_NUMBER}"
         ECR_URI = "${ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO_NAME}"
-        SONARQUBE_ENV = "sonarqube-server"
+        SONARQUBE_ENV = "sonar-server"
     }
     
     stages {
