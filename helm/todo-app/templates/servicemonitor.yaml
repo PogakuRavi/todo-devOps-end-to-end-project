@@ -3,7 +3,7 @@ kind: ServiceMonitor
 metadata:
   name: todo-app-monitor
   labels:
-    release: monitoring
+    Release: monitoring
 spec:
   selector:
     matchLabels:
