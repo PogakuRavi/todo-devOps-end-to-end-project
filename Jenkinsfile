@@ -80,6 +80,23 @@ pipeline {
             }
         }
     }
+        stage('Update Helm Chart') {
+            steps {
+            withCredentials([string(credentialsId: 'github-token', variable: 'GIT_TOKEN')]) {
+        sh '''
+            rm -rf helm-repo
+            git clone https://${GIT_TOKEN}@github.com/PogakuRavi/todo-devOps-end-to-end-project.git helm-repo
+            cd helm-repo/helm/todo-app
+            sed -i 's/tag:.*/tag: "'${IMAGE_TAG}'"/' values.yaml
+            git config user.name "jenkins"
+            git config user.email "jenkins@gmail.com"
+            git add values.yaml
+            git commit -m "Update image tag ${IMAGE_TAG}"
+            git push
+        '''
+            }
+        }
+    }
 
     post {
         success {
